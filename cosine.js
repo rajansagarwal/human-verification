@@ -1,10 +1,42 @@
-// basic for now, working on fixing it soon lol
+function cosineSimilarity(vec1, vec2) {
+    const dotProduct = vec1.map((val, i) => val * vec2[i]).reduce((accum, curr) => accum + curr, 0);
+    const vec1Size = calcVectorSize(vec1);
+    const vec2Size = calcVectorSize(vec2);
+  
+    return dotProduct / (vec1Size * vec2Size);
+  };
+  
+  function tf(word, doc) {
+    const wordOccurences = doc.filter(w => w === word).length;
+    return wordOccurences / doc.length;
+  };
+  
+  function idf(word, doc, otherDocs) {
+    const docsContainingWord = [doc].concat(otherDocs).filter(doc => {
+      return !!doc.find(w => w === word);
+    });
+  
+    return (1 + otherDocs.length) / docsContainingWord.length;
+  };
 
-const { similarity }  = require('string-cosine-similarity');
+  function omitPunctuations(word) {
+    return word.replace(/[\!\.\,\?\-\?]/gi, '');
+  };
+  
+  function toLowercase(word) {
+    return word.toLowerCase();
+  };
+  
+  function calcVectorSize(vec) {
+    return Math.sqrt(vec.reduce((accum, curr) => accum + Math.pow(curr, 2), 0));
+  };
+
+
 const stringSimilarity = require('string-similarity');
+const regression = require('regression')
 const { compare } = require('string-compare');
 
-var base = [
+var sample = [
     '@jc_bourque  @romeis15  @dermotmcg  @AndreiGuta2017  @RayvkAus  @BrandonCreel3  @0xRuijerd  @Promoter_NFT9  @DenisHacquin  @emilevictorp  @AndreiSPana  @AndreiPatrunsu  @Fily_13  @kexzzzy  @Vitaliy04358373  @kuilef  @AlphariusLegion  @meowttt7  @lindyholicpart2  @RySz_14  @splayalistick', 
     '@StefanoChiri_10  @Simsc888  @KadiriTohir  @Katheri07560982  @Cop1_May0  @codyboston19  @ethplayer_else  @INT_President  @Molly36473762  @reetudes  @JDeLuccia  @g3rgg16  @Cryptokid888  @Ianhomew  @gust_gust3  @ayuen_deng413  @cardrare1', 
     'Metacrocodile presale will be on Unicrypt⏰  ✅KYC and audit by SOLIDPROOF ✅Huge marketing plans  ✅DEX trending ✅Liquidity will be lock at least 1 Years   ✅Listing on CMC&CG after launch ✅Ownership renounced Join us 💬 Telegram:+', 
@@ -32,35 +64,92 @@ var base = [
 ]
 
 var input = ['@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
-             '@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
-             '@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
-             '@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
-             '@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
-];
+             'random tweet with random people :)))',
+             'i just minted EXCLUSIVE DROP',
+             '0.001 Litecoin(LTC) Crypto Mining-Contract (0.001 LTC)',
+             'Follow this number for follow back on twitter #retweet',
+            ];
 
-const array = [];
+var bios = ['@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!',
+            'random tweet with random people :)))',
+            'i just minted EXCLUSIVE DROP',
+            '0.001 Litecoin(LTC) Crypto Mining-Contract (0.001 LTC)',
+            'Follow this number for follow back on twitter #retweet',
+           ];
 
-console.log('')
+const array = []
+const final = []
+const bio = []
 
-for (let j = 0; j < input.length; j++) {
-    for (let i = 0; i < base.length; i++) {
-        const model1 = stringSimilarity.compareTwoStrings(input[j], base[i])
-        const model2 = compare(input[j], base[i]);
-        if (model1 > 0.15) {
-            if (model2 > 0.2) {
-                array.push(base[i])
-                console.log('high confidence' + ', ' + i + ', ' + (model2 + model1)/2)
-            }
+console.log('comparing...')
+
+/*for (let i = 0; i < input.length; i++) {
+    for (let j = 0; j < sample.length; j++) {
+        const model1 = stringSimilarity.compareTwoStrings(input[i], sample[j])
+        const model2 = compare(input[i], sample[j]);
+        const modelavg = (model1 + model2)/2;
+        const userbio1 = stringSimilarity.compareTwoStrings(bios[i], sample[j])
+        const userbio2 = stringSimilarity.compareTwoStrings(bios[i], sample[j])
+        const useravg = (userbio1 + userbio2)/2
+        if (modelavg > 0.1 && useravg > 0.1) {
+            array.push(input[i])
+            console.log('POST' + ', ' + j + ', ' + (1 - (model2 + model1)/2))
+            final.push([1 - modelavg, 1 - useravg])
         }
     } 
 }
+
+for (let i = 0; i < bios.length; i++) {
+    for (let j = 0; j < sample.length; j++) {
+        const bios1 = stringSimilarity.compareTwoStrings(bios[i], sample[j])
+        const bios2 = compare(bios[i], sample[j]);
+        if (bios1 > 0.1 && bios2 > 0.1) {
+            array.push(bios[j])
+            console.log('BIO' + ', ' + j + ', ' + (1 - (bios1 + bios2)/2))
+        } else if (bios1 || bios2) {
+            bio.push([1 - (bios2 + bios1)/2])
+        }
+    } 
+}
+*/
 console.log('')
 
-if (array.length > 4) {
-    console.log('BOTBOTBOT')
-} else if (array.length > 0) {
-    console.log('Probably')
-} else {
-    console.log('Human!')
+function userInfo(post, bio) {
+    for (let i = 0; i < input.length; i++) {
+        for (let j = 0; j < sample.length; j++) {
+            const model1 = stringSimilarity.compareTwoStrings(post, sample[j])
+            const model2 = compare(post, sample[j]);
+            const modelavg = (model1 + model2)/2;
+            const userbio1 = stringSimilarity.compareTwoStrings(bio, sample[j])
+            const userbio2 = stringSimilarity.compareTwoStrings(bio, sample[j])
+            const useravg = (userbio1 + userbio2)/2
+            const avg = (modelavg + useravg)/2
+            if (avg > 0.05) {
+                // console.log(j + ', ' + (1 - (model2 + model1)/2))
+                final.push([1 - modelavg, 1 - useravg])
+            } 
+        }  
+    }
+
+    if (final.length > 4) {
+        console.log(post.slice(0, 5) + '... is a bot')
+    } else if (final.length > 2) {
+        console.log(post.slice(0, 5) + '... probably a bot')
+    } 
+    else if (final.length > 0) {
+        console.log('Unsure about ' + post.slice(0, 5) + '...')
+    } else {
+        console.log(post.slice(0, 5) + '... is a human')
+    }
 }
-// console.log(array)
+
+userInfo('wow', 'bruh');
+userInfo('@bniubhnjiuvbh @baovuapfi @ziruobf great airdrop!', '0.001 Litecoin(LTC) Crypto Mining-Contract (0.001 LTC) #crypto #cryptocurrency #bitcoin #dogecoin')
+
+if (final.length > 0) {
+    console.log(final.slice(0, 2))
+}
+
+const result = regression.linear(final);
+const gradient = result.equation[0];
+const yIntercept = result.equation[1];
