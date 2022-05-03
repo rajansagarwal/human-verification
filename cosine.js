@@ -98,19 +98,6 @@ console.log('comparing...')
         }
     } 
 }
-
-for (let i = 0; i < bios.length; i++) {
-    for (let j = 0; j < sample.length; j++) {
-        const bios1 = stringSimilarity.compareTwoStrings(bios[i], sample[j])
-        const bios2 = compare(bios[i], sample[j]);
-        if (bios1 > 0.1 && bios2 > 0.1) {
-            array.push(bios[j])
-            console.log('BIO' + ', ' + j + ', ' + (1 - (bios1 + bios2)/2))
-        } else if (bios1 || bios2) {
-            bio.push([1 - (bios2 + bios1)/2])
-        }
-    } 
-}
 */
 console.log('')
 
